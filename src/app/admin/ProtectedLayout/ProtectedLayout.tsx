@@ -1,29 +1,57 @@
+'use client'
+
 import { ReactNode, useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 
-export default function ProtectedLayout({ children }: { children: ReactNode }) {
+type ProtectedLayoutProps = {
+  children: ReactNode
+  allowedRoles?: string[] // ex: ['admin'], ['dev', 'admin'], etc
+}
+
+export default function ProtectedLayout({
+  children,
+  allowedRoles = ['admin', 'dev'], // por padrão só permite admin/dev
+}: ProtectedLayoutProps) {
   const router = useRouter()
-  const pathname = usePathname() // Captura a rota atual
+  const pathname = usePathname()
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const [userRole, setUserRole] = useState<string | null>(null)
 
   useEffect(() => {
     const token = localStorage.getItem('cerebro-token')
-    const isLoginPage = pathname === '/login' // Verifica se estamos na página de login
+    const role = localStorage.getItem('cerebro-role') // novo: nível de acesso
+    const isLoginPage = pathname === '/login'
 
-    // Se não tiver token e não estiver na página de login, redireciona
+    // Sem token e não na página de login: redireciona para login
     if (!token && !isLoginPage) {
-      router.push('/login') // Redireciona para a página de login
-    } else if (token && isLoginPage) {
-      router.push('/admin/dashboard') // Se já estiver logado, vai direto para o dashboard
-    } else {
-      setIsAuthenticated(!!token) // Se o token existir, marca como autenticado
+      router.push('/login')
+      return
     }
-  }, [router, pathname]) // Depende do pathname para verificar a página atual
+
+    // Já está logado e acessando login: redireciona para dashboard
+    if (token && isLoginPage) {
+      router.push('/admin/dashboard')
+      return
+    }
+
+    // Está logado, mas não tem permissão
+    if (token && role && !allowedRoles.includes(role)) {
+      router.push('/unauthorized') // página opcional para acesso negado
+      return
+    }
+
+    // OK
+    setUserRole(role)
+    setIsAuthenticated(!!token)
+  }, [router, pathname, allowedRoles])
 
   if (isAuthenticated === null) {
-    return null // Loading state, aguarda a verificação de autenticação
+    return (
+      <div className="text-white text-center mt-20 text-lg">
+        Carregando verificação de acesso...
+      </div>
+    )
   }
 
-  return <>{children}</> // Exibe o conteúdo protegido se o usuário estiver autenticado
+  return <>{children}</>
 }
-
