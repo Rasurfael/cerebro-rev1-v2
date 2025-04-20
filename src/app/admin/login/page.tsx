@@ -13,10 +13,9 @@ export default function LoginPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
-    if (email === 'admin@r3s.com.br' && senha === 'admin123') {
-      // Simulando a autenticação com um token falso
+    if (email === 'rafael@r3s.com.br' && senha === 'Rafael123') {
       localStorage.setItem('cerebro-token', 'mocked-token')
-      router.push('/admin/dashboard') // Redireciona para o dashboard após login
+      router.push('/admin/dashboard')
     } else {
       setErro('Credenciais inválidas')
     }
@@ -32,8 +31,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 relative">
-      {/* Logo no canto superior esquerdo */}
+    <div className="min-h-screen flex items-center justify-center bg-[#1a1a1a] relative">
+      {/* Logo */}
       <img
         src="/logo-r3s.png"
         alt="Logo R3S"
@@ -44,7 +43,7 @@ export default function LoginPage() {
         onSubmit={recuperando ? handleRecuperar : handleLogin}
         className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-md border border-gray-200 text-black"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">
+        <h2 className="text-2xl font-bold mb-6 text-center text-black">
           {recuperando ? 'Recuperar Senha' : 'Acesso ao CÉREBRO'}
         </h2>
 
@@ -58,7 +57,7 @@ export default function LoginPage() {
         <input
           type="email"
           placeholder="E-mail"
-          className="w-full px-4 py-2 border border-gray-300 rounded-xl mb-4 bg-gray-50"
+          className="w-full px-4 py-2 border border-gray-300 rounded-xl mb-4 bg-gray-50 text-black"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -67,7 +66,7 @@ export default function LoginPage() {
           <input
             type="password"
             placeholder="Senha"
-            className="w-full px-4 py-2 border border-gray-300 rounded-xl mb-6 bg-gray-50"
+            className="w-full px-4 py-2 border border-gray-300 rounded-xl mb-6 bg-gray-50 text-black"
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
           />
@@ -83,19 +82,27 @@ export default function LoginPage() {
         <div className="text-center text-sm text-gray-700">
           {!recuperando ? (
             <button
-              onClick={() => setRecuperando(true)}
               type="button"
-              className="text-blue-500"
+              onClick={() => {
+                setErro('')
+                setRecuperado(false)
+                setRecuperando(true)
+              }}
+              className="text-blue-600 hover:underline"
             >
               Esqueceu a senha?
             </button>
           ) : (
             <button
-              onClick={() => setRecuperando(false)}
               type="button"
-              className="text-blue-500"
+              onClick={() => {
+                setErro('')
+                setRecuperado(false)
+                setRecuperando(false)
+              }}
+              className="text-blue-600 hover:underline"
             >
-              Voltar
+              Voltar ao login
             </button>
           )}
         </div>
@@ -103,4 +110,3 @@ export default function LoginPage() {
     </div>
   )
 }
-
